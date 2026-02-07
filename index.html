@@ -391,6 +391,68 @@
             font-size: 0.8rem;
         }
 
+        /* Toggle controls - 右上角开关控制面板 */
+        .toggle-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 15px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .toggle-btn .icon {
+            font-size: 1rem;
+        }
+
+        /* Hidden states controlled by toggle */
+        .hide-carousel-indicator .carousel-indicator {
+            display: none !important;
+        }
+
+        .hide-gif-button .gif-button {
+            display: none !important;
+        }
+
+        .hide-edit-button .edit-button {
+            display: none !important;
+        }
+
+        /* Image fit mode toggle - 图片显示模式切换 */
+        .image-fit-contain .cat-image {
+            object-fit: contain !important;
+            background: #f0f0f0;
+        }
+
         /* Loading animation */
         .loading {
             text-align: center;
@@ -426,6 +488,26 @@
     </style>
 </head>
 <body>
+    <!-- Toggle controls - 开关控制面板 -->
+    <div class="toggle-controls">
+        <button class="toggle-btn active" data-toggle="carousel-indicator" title="显示/隐藏轮播数字标签">
+            <span class="icon">🔢</span>
+            <span>标签</span>
+        </button>
+        <button class="toggle-btn active" data-toggle="gif-button" title="显示/隐藏导出GIF按钮">
+            <span class="icon">🎬</span>
+            <span>GIF</span>
+        </button>
+        <button class="toggle-btn active" data-toggle="edit-button" title="显示/隐藏编辑信息按钮">
+            <span class="icon">✏️</span>
+            <span>编辑</span>
+        </button>
+        <button class="toggle-btn" data-toggle="image-fit" data-mode="cover" title="切换图片显示模式：剪裁/适应">
+            <span class="icon">🖼️</span>
+            <span class="fit-label">剪裁</span>
+        </button>
+    </div>
+
     <div class="container">
         <h1 class="title">🐱 喵宇宙 </h1>
         <div id="cardsContainer" class="cards-grid">
@@ -1171,6 +1253,58 @@
         } else {
             initCatCards();
         }
+
+        /**
+         * Setup toggle controls functionality
+         * 设置开关控制功能
+         */
+        function initToggleControls() {
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            const body = document.body;
+
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const toggleType = btn.getAttribute('data-toggle');
+
+                    // Handle image fit mode toggle specially
+                    if (toggleType === 'image-fit') {
+                        const fitLabel = btn.querySelector('.fit-label');
+                        const currentMode = btn.getAttribute('data-mode');
+
+                        if (currentMode === 'cover') {
+                            // Switch to contain (适应)
+                            btn.setAttribute('data-mode', 'contain');
+                            fitLabel.textContent = '适应';
+                            btn.classList.add('active');
+                            body.classList.add('image-fit-contain');
+                        } else {
+                            // Switch to cover (剪裁)
+                            btn.setAttribute('data-mode', 'cover');
+                            fitLabel.textContent = '剪裁';
+                            btn.classList.remove('active');
+                            body.classList.remove('image-fit-contain');
+                        }
+                        return;
+                    }
+
+                    // Handle other toggles (show/hide)
+                    const hideClass = `hide-${toggleType}`;
+
+                    // Toggle button active state
+                    btn.classList.toggle('active');
+
+                    // Toggle body class to hide/show elements
+                    if (btn.classList.contains('active')) {
+                        body.classList.remove(hideClass);
+                    } else {
+                        body.classList.add(hideClass);
+                    }
+                });
+            });
+        }
+
+        // Initialize toggle controls
+        initToggleControls();
     </script>
 </body>
 </html>
